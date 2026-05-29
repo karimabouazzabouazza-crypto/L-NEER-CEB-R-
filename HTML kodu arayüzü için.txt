@@ -1,0 +1,443 @@
+Projede HTML tabanlı mini arayüz demo sistemi de geliştirilmiştir.
+HTML kodu arayüzü için :
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lineer Cebir Projesi - Dış Ticaret Karar Destek Sistemi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --bg-color: #f3f4f6;
+            --sidebar-bg: #1e293b;
+            --accent-color: #3b82f6;
+            --text-dark: #0f172a;
+        }
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+        /* Sol Menü ve Öğrenci Bilgisi */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 25px 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        }
+        .student-info-box {
+            background: rgba(255,255,255,0.05);
+            margin: 0 15px 25px 15px;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+            font-size: 0.85rem;
+        }
+        .sidebar h4 {
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #f1f5f9;
+        }
+        .sidebar a {
+            padding: 12px 25px;
+            text-decoration: none;
+            color: #94a3b8;
+            display: block;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background-color: #334155;
+            color: white;
+            border-left: 4px solid var(--accent-color);
+        }
+        .sidebar a i { margin-right: 12px; width: 20px; text-align: center; }
+        
+        /* Ana İçerik */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+        }
+        /* Kartlar */
+        .academic-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+        }
+        .card-title-academic {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .metric-badge {
+            background: #eff6ff;
+            color: #1e40af;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        /* Isı Haritası Simülasyonu */
+        .similarity-cell {
+            font-weight: 600;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div>
+            <h4><i class="fa-solid fa-graduation-cap text-primary mb-2 d-block fs-3"></i> BEYKOZ ÜNİVERSİTESİ</h4>
+            <div class="student-info-box">
+                <p class="m-0"><strong>Öğrenci:</strong> Karima Bouazza</p>
+                <p class="m-0"><strong>No:</strong> 2304040033</p>
+                <p class="m-0"><strong>Ders:</strong> Lineer Cebir</p>
+                <p class="m-0"><strong>Proje:</strong> Dış Ticaret Karar Destek Sistemi</p>
+            </div>
+            <a href="#dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Genel Gösterge Paneli</a>
+            <a href="#pca-section"><i class="fa-solid fa-vector-square"></i> PCA Analizi & Biplot</a>
+            <a href="#similarity-section"><i class="fa-solid fa-matrix"></i> Kosinüs Benzerliği</a>
+            <a href="#tuik-section"><i class="fa-solid fa-coins"></i> TÜİK 2026 Verileri</a>
+        </div>
+        <div class="text-center text-muted" style="font-size: 0.75rem;">
+            Rapor Tarihi: 21.05.2026
+        </div>
+    </div>
+
+    <div class="main-content" id="dashboard">
+        
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="fw-bold text-dark m-0">Dış Ticaret Karar Destek Sistemi Geliştirilmesi</h2>
+                <p class="text-muted m-0">Lineer Cebir Prensipleri ve Matris Dönüşümleri Tabanlı Analiz Paneli</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <i class="fa-solid fa-earth-americas text-secondary"></i>
+                <select id="countrySelector" class="form-select form-select-md shadow-sm fw-bold" style="min-width: 180px;">
+                    </select>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-md-4">
+                <div class="academic-card text-center border-top border-primary border-4">
+                    <span class="text-muted small text-uppercase fw-bold">Nüfus (Population)</span>
+                    <h3 class="fw-bold mt-2 text-dark" id="lblPop">0</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="academic-card text-center border-top border-success border-4">
+                    <span class="text-muted small text-uppercase fw-bold">Kişi Başı GDP ($)</span>
+                    <h3 class="fw-bold mt-2 text-success" id="lblGdp">$0</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="academic-card text-center border-top border-warning border-4">
+                    <span class="text-muted small text-uppercase fw-bold">En Dominant Sektör</span>
+                    <h3 class="fw-bold mt-2 text-warning" id="lblSector">-</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="academic-card">
+                    <div class="card-title-academic"><i class="fa-solid fa-chart-pie text-primary"></i> Sektörel Ekonomik Ağırlık</div>
+                    <canvas id="sectorRadarChart" height="200"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="academic-card h-100">
+                    <div class="card-title-academic"><i class="fa-solid fa-square-root-variable text-secondary"></i> Lineer Cebir İşlevselliği</div>
+                    <p class="small text-muted">Raporda belirtildiği üzere, çok değişkenli bu sistemde ülkelerin ekonomik yapısı şu lineer denklemle modellenmektedir:</p>
+                    <blockquote class="blockquote bg-light p-3 rounded text-center font-monospace small">
+                        Ülke Vektörü = [Nüfus, GDP, Tarım, Sanayi, Hizmet]
+                    </blockquote>
+                    <p class="small text-muted">Kriter birleştirmeleri ve ağırlık hesaplamaları, ağırlık vektörü ile kriter vektörünün <strong>nokta çarpımı (dot product)</strong> hesaplanarak elde edilir.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2" id="pca-section">
+            <div class="col-12">
+                <div class="academic-card">
+                    <div class="card-title-academic"><i class="fa-solid fa-diagram-project text-danger"></i> PCA Biplot - Ekonomik Göstergeler Boyut İndirgeme (Varyans: %76.73)</div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <canvas id="pcaBiplotChart" height="140"></canvas>
+                        </div>
+                        <div class="col-md-4 bg-light p-3 rounded">
+                            <h6 class="fw-bold text-dark"><i class="fa-solid fa-lightbulb text-warning"></i> PCA Bulguları ve Yorumlar</h6>
+                            <ul class="small text-muted ps-3">
+                                <li class="mb-2"><strong>USA & Almanya:</strong> Yüksek GDP ve Hizmet (Service) sektörü vektörüne paralel konumdadır.</li>
+                                <li class="mb-2"><strong>Cezayir & Türkiye:</strong> Tarım (Agriculture) bileşenine daha yakın korelasyon göstermektedir.</li>
+                                <li class="mb-1"><strong>Çin:</strong> Muazzam Nüfus (Population) ve Sanayi (Industry) yükü sebebiyle diğer tüm ülkelerden ayrışarak üst bölgede kümelenmiştir.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2" id="similarity-section">
+            <div class="col-12">
+                <div class="academic-card">
+                    <div class="card-title-academic"><i class="fa-solid fa-table-cells text-success"></i> Kosinüs Benzerliği Matrisi (Cosine Similarity Matrix)</div>
+                    <div class="mb-4 small text-muted">
+                        Vektörler arasındaki açısal benzerliği ölçen lineer matematiksel formül:
+                        <div class="my-2 fs-6">
+                            $$\text{Similarity} = \cos(\theta) = \frac{A \cdot B}{\|A\| \|B\|}$$
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle m-0 table-sm text-center">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Ülke</th>
+                                    <th>Türkiye</th>
+                                    <th>Cezayir</th>
+                                    <th>Almanya</th>
+                                    <th>Çin</th>
+                                    <th>ABD</th>
+                                    <th>Japonya</th>
+                                </tr>
+                            </thead>
+                            <tbody id="similarityGridBody">
+                                </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 alert alert-info small m-0">
+                        <i class="fa-solid fa-circle-info"></i> <strong>Akademik Çıkarım:</strong> En yüksek benzerlik <strong>Almanya - Japonya (0.99)</strong> arasında çıkmıştır (Gelişmiş sanayi/hizmet yapısı). İkinci en yüksek benzerlik ise <strong>Türkiye - Cezayir (0.85)</strong> arasındadır.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2" id="tuik-section">
+            <div class="col-md-7">
+                <div class="academic-card">
+                    <div class="card-title-academic"><i class="fa-solid fa-chart-line text-info"></i> TÜİK 2026 Dış Ticaret Trendi (İlk 4 Ay)</div>
+                    <canvas id="tuikLineChart" height="150"></canvas>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="academic-card h-100">
+                    <div class="card-title-academic"><i class="fa-solid fa-list-check text-secondary"></i> TÜİK Ham Veri Havuzu</div>
+                    <div class="table-responsive" style="max-height: 250px;">
+                        <table class="table table-striped table-hover small m-0 text-end">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="text-start">Ay (2026)</th>
+                                    <th>İhracat (USD)</th>
+                                    <th>İthalat (USD)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="text-start fw-bold">Ocak</td><td>20.329.140.000</td><td>28.696.382.057</td></tr>
+                                <tr><td class="text-start fw-bold">Şubat</td><td>21.030.890.032</td><td>30.078.262.336</td></tr>
+                                <tr><td class="text-start fw-bold">Mart</td><td>21.896.870.203</td><td>33.119.359.794</td></tr>
+                                <tr><td class="text-start fw-bold">Nisan</td><td>25.408.276.191</td><td>33.908.621.290</td></tr>
+                                <tr class="table-dark fw-bold">
+                                    <td class="text-start">Toplam</td><td>88.665.176.426</td><td>125.802.625.477</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Rapordaki birebir veri seti
+        const dataset = [
+            { id: "tr", name: "Turkey", pop: 85200000, gdp: 10600, agri: 0.061, ind: 0.320, serv: 0.619 },
+            { id: "dz", name: "Algeria", pop: 44900000, gdp: 3800, agri: 0.132, ind: 0.458, serv: 0.410 },
+            { id: "de", name: "Germany", pop: 83200000, gdp: 52000, agri: 0.008, ind: 0.303, serv: 0.689 },
+            { id: "cn", name: "China", pop: 1412000000, gdp: 12600, agri: 0.073, ind: 0.393, serv: 0.534 },
+            { id: "us", name: "USA", pop: 331000000, gdp: 70000, agri: 0.010, ind: 0.191, serv: 0.799 },
+            { id: "jp", name: "Japan", pop: 125000000, gdp: 40000, agri: 0.011, ind: 0.290, serv: 0.699 }
+        ];
+
+        // Rapordaki Kosinüs Benzerlik Matrisi Değerleri
+        const matrixCountries = ["Turkey", "Algeria", "Germany", "China", "USA", "Japan"];
+        const similarityMatrix = [
+            [1.0, 0.85, -0.6, 0.2, -0.8, -0.56],
+            [0.85, 1.0, -0.8, 0.4, -0.85, -0.81],
+            [-0.6, -0.8, 1.0, -0.8, 0.8, 0.99],
+            [0.2, 0.4, -0.8, 1.0, -0.68, -0.8],
+            [-0.8, -0.85, 0.8, -0.68, 1.0, 0.79],
+            [-0.56, -0.81, 0.99, -0.8, 0.79, 1.0]
+        ];
+
+        let radarChartInstance = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const selector = document.getElementById("countrySelector");
+            
+            // Seçim kutusunu doldurma
+            dataset.forEach(c => {
+                selector.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+            });
+
+            // Kosinüs Benzerlik Tablosunu oluşturma ve renklendirme
+            const simBody = document.getElementById("similarityGridBody");
+            similarityMatrix.forEach((row, rIdx) => {
+                let htmlRow = `<tr><td class="fw-bold bg-light text-start">${matrixCountries[rIdx]}</td>`;
+                row.forEach(val => {
+                    let cellBg = "";
+                    if(val === 1.0) cellBg = "background-color: #cbd5e1; color: #0f172a;";
+                    else if(val > 0.8) cellBg = "background-color: #dcfce7; color: #166534;";
+                    else if(val > 0) cellBg = "background-color: #f0fdf4; color: #166534;";
+                    else cellBg = "background-color: #fee2e2; color: #991b1b;";
+
+                    htmlRow += `<td class="similarity-cell" style="${cellBg}">${val.toFixed(2)}</td>`;
+                });
+                htmlRow += `</tr>`;
+                simBody.innerHTML += htmlRow;
+            });
+
+            // Değişim olayını dinleme
+            selector.addEventListener("change", (e) => updateDashboard(e.target.value));
+            
+            // İlk açılış verisi (Türkiye)
+            updateDashboard("tr");
+
+            // TÜİK Çizgi Grafik Entegrasyonu
+            initTuikChart();
+
+            // PCA Biplot Çizimi (Rapordaki Grafik Koordinatlarının Matematiksel İzdüşümü)
+            initPcaBiplot();
+        });
+
+        function updateDashboard(id) {
+            const country = dataset.find(c => c.id === id);
+            if(!country) return;
+
+            document.getElementById("lblPop").innerText = country.pop.toLocaleString();
+            document.getElementById("lblGdp").innerText = "$" + country.gdp.toLocaleString();
+            
+            let dominant = "Hizmet";
+            if(country.ind > country.agri && country.ind > country.serv) dominant = "Sanayi";
+            if(country.agri > country.ind && country.agri > country.serv) dominant = "Tarım";
+            document.getElementById("lblSector").innerText = dominant;
+
+            // Radar Grafik Güncellemesi
+            const ctx = document.getElementById('sectorRadarChart').getContext('2d');
+            if(radarChartInstance) radarChartInstance.destroy();
+
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Tarım (Agriculture)', 'Sanayi (Industry)', 'Hizmet (Service)'],
+                    datasets: [{
+                        label: `${country.name} Sektörel Dağılım Payı`,
+                        data: [country.agri, country.ind, country.serv],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: '#3b82f6',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#1d4ed8'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { r: { min: 0, max: 1 } }
+                }
+            });
+        }
+
+        function initTuikChart() {
+            const ctx = document.getElementById('tuikLineChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Ocak', 'Şubat', 'Mart', 'Nisan'],
+                    datasets: [
+                        {
+                            label: 'İhracat (USD)',
+                            data: [20329140000, 21030890032, 21896870203, 25408276191],
+                            borderColor: '#10b981',
+                            tension: 0.2,
+                            fill: false
+                        },
+                        {
+                            label: 'İthalat (USD)',
+                            data: [28696382057, 30078262336, 33119359794, 33908621290],
+                            borderColor: '#ef4444',
+                            tension: 0.2,
+                            fill: false
+                        }
+                    ]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        function initPcaBiplot() {
+            const ctx = document.getElementById('pcaBiplotChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Ülkeler',
+                            data: [
+                                {x: -0.9, y: -0.8, label: 'Turkey'},
+                                {x: -2.1, y: -1.2, label: 'Algeria'},
+                                {x: 1.4, y: -0.1, label: 'Germany'},
+                                {x: -2.4, y: 1.8, label: 'China'},
+                                {x: 2.9, y: 0.4, label: 'USA'},
+                                {x: 1.2, y: -0.1, label: 'Japan'}
+                            ],
+                            backgroundColor: '#3b82f6',
+                            pointRadius: 8,
+                            pointHoverRadius: 10,
+                            datalabels: { display: true }
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) { return ctx.raw.label + ` (PC1: ${ctx.raw.x}, PC2: ${ctx.raw.y})`; }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { min: -3, max: 4, title: { display: true, text: 'PC1 (76.73%)' } },
+                        y: { min: -2, max: 3, title: { display: true, text: 'PC2 (18.35%)' } }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

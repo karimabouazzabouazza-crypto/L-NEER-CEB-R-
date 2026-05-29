@@ -1,0 +1,1 @@
+Lineer Cebir Tabanlı Dış Ticaret Karar Destek Sistemi
